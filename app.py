@@ -1,17 +1,19 @@
 from ipyleaflet import Choropleth, Map, GeoJSON, Popup, Marker
 from shapely.geometry import Point, Polygon
-from shiny import App, ui, render
+from shiny import App, ui, render, reactive
 from shinywidgets import output_widget, render_widget  
 from branca.colormap import linear
 import json
 import pandas as pd
 import numpy as np
+from IPython.display import display, IFrame
 
 
-happiness_report = pd.read_csv("worldMap/world_happiness_2019.csv")
+
+happiness_report = pd.read_csv("world_happiness_2019.csv")
 
 
-with open('worldMap/custom_geo.json', 'r') as f:
+with open('custom_geo.json', 'r') as f:
     geo_json_data = json.load(f)
     for d in geo_json_data["features"]:
         d["name"] = d["properties"]["name_sort"]
@@ -59,18 +61,19 @@ for d in geo_json_data["features"]:
 
 app_ui = ui.page_fluid(
     output_widget("map"),
-    # ui.layout_columns(
-    #     ui.input_radio_buttons(
-    #         "mode", "Display mode", ["Table", "Plot"], selected="Table"
-    #     ),
-    #     ui.output_ui("mode_controls"),
-    # )
+    # ui.output_ui("map"),
+    ui.h2("Country Information"),
+    # ui.output_text("country_info"),  # This will display the country-specific info
+    ui.br(),
 )
 
 
 def server(input, output, session):
 
-    @render_widget  
+    selected_country = reactive.Value(None)
+
+    @render_widget
+    # @render.ui  
     def map():
 
         layer = Choropleth(
@@ -84,13 +87,15 @@ def server(input, output, session):
        
         m.add_layer(layer)
 
+        # Utility function to check if a point is inside a polygon
+        def point_in_polygon(point, polygon):
+            point = Point(point[1], point[0])  # Longitude, Latitude
+            poly = Polygon(polygon)
+            return poly.contains(point)
 
         def handle_click(**kwargs):
             if kwargs.get('type') == 'click':
                 coordinates = kwargs.get('coordinates')
-                
-                
-                
                 if coordinates:
                     # Identify the country by checking the GeoJSON data
                     clicked_country = None
@@ -107,21 +112,39 @@ def server(input, output, session):
 
                     if clicked_country:
                         print(f"Clicked country: {clicked_country}")
+                        selected_country.set(clicked_country)
+                        # print(f"Clicked country: {selected_country}")
                     else:
-                        print("No country found at the clicked location.")
+                        #print("No country found at the clicked location.")
+                        selected_country.set("No country found at the clicked location.")
 
-        # Utility function to check if a point is inside a polygon
-        def point_in_polygon(point, polygon):
-            point = Point(point[1], point[0])  # Longitude, Latitude
-            poly = Polygon(polygon)
-            return poly.contains(point)
 
-    
- 
         m.on_interaction(handle_click)
+
+
 
         return m
     
+
+    @output
+    @render.text
+    def country_name():
+        country = selected_country.get()
+        if country:
+            return f"Country: {country}"
+        return "No country selected"
+
+    # @output
+    # @render.text
+    # def happiness_score():
+    #     country = selected_country.get()
+    #     if country and country in happiness_scores:
+    #         return f"Happiness Score: {happiness_scores[country]}"
+    #     elif country:
+    #         return "Happiness Score: Data not available"
+    #     return "No country selected"
+
+    return locals()  # Ensure 'map', 'country_name', and 'happiness_score' are available in the local scope
 
     
 app = App(app_ui, server)
