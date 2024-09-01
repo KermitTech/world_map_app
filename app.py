@@ -58,7 +58,7 @@ for d in geo_json_data["features"]:
 
 
 
-def create_map():
+def create_map(selected_country):
 
     layer = Choropleth(
             geo_data=geo_json_data,
@@ -71,7 +71,6 @@ def create_map():
        
     m.add_layer(layer)
 
-    selected_country = reactive.Value(None)
     # Utility function to check if a point is inside a polygon
     def point_in_polygon(point, polygon):
         point = Point(point[1], point[0])  # Longitude, Latitude
@@ -96,65 +95,74 @@ def create_map():
                                 break
 
                 if clicked_country:
-                    print(f"Clicked country: {clicked_country}")
                     selected_country.set(clicked_country)
-                    print(f"Clicked country: {selected_country}")
-                else:
-                    #print("No country found at the clicked location.")
-                    selected_country.set("No country found at the clicked location.")
-
 
     m.on_interaction(handle_click)    
-
     return m
 
 
-def home_ui():
+def country_details(country):
     return ui.page_fluid(
-        ui.h2("Home Page"),
-        ui.p("Welcome to the Home Page!"),
-        ui.input_action_button("show_map", "Go to Map Page"),
+        ui.h2(f"Happiness score for {country}"),
+        ui.p(f"Welcome to the country details Page for {country}!"),
+        ui.input_action_button("show_map_page", "Go Back to Map Page"),
+        # ui.input_action_button("show_map", "Go to Map Page"),
     )
 
 
 def server(input, output, session):
 
-    page = reactive.Value("home")
+    page = reactive.Value("map")
+    selected_country = reactive.Value(None)
 
     # Switch to map page
     @reactive.Effect
-    @reactive.event(input.show_map)
+    @reactive.event(input.show_map_page)
     def show_map_page():
         page.set("map")
 
-    # Switch to home page
+    # Switch to country_details page
     @reactive.Effect
-    @reactive.event(input.show_home)
-    def show_home_page():
-        page.set("home")
+    def update_to_country_details_page():
+        if selected_country.get():
+            page.set("country_details")
     
 
     @output
     @render.ui
-    def main_ui():
-        if page.get() == "home":
-            return home_ui()  # Call the home_ui function defined outside
-        elif page.get() == "map":
-            return ui.page_fluid(
-                output_widget("map"),
-                ui.input_action_button("show_home", "Go Back to Home Page"),
-            )
+    def country_details_ui():
+        if page.get() == "country_details":
+            country = selected_country.get()
+            # print(country)
+            if country:
+                return country_details(country)
+                # ui.input_action_button("show_map_page", "Go Back to Map Page"),
+            else:
+                return ui.page_fluid(
+                    ui.h2("No country selected"),
+                    ui.input_action_button("show_map_page", "Go Back to Map Page"),
+                )
+        
 
     @output
     @render_widget
     def map():
-        return create_map()
+        return create_map(selected_country)
     
-    
+    @output
+    @render.ui
+    def map_ui():
+        if page.get() == "map":
+            return ui.page_fluid(
+                output_widget("map")
+            )
+
+
 
 
 app_ui = ui.page_fluid(
-    ui.output_ui("main_ui"),
+    ui.output_ui("map_ui"),
+    ui.output_ui("country_details_ui"),
     # output_widget("map"),
 )
 
