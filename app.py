@@ -56,7 +56,7 @@ for d in geo_json_data["features"]:
         else:
             mapping[d["name"]] = 0
 
-
+# print(mapping["Norway"])
 
 def create_map(selected_country):
 
@@ -103,9 +103,10 @@ def create_map(selected_country):
 
 def country_details(country):
     return ui.page_fluid(
-        ui.h2(f"Happiness score for {country}"),
-        ui.p(f"Welcome to the country details Page for {country}!"),
         ui.input_action_button("show_map_page", "Go Back to Map Page"),
+        ui.h2(f"Welcome to the country details Page for {country}!"),
+        ui.p(f"Happiness score for {country} = {mapping[country]}"),
+
         # ui.input_action_button("show_map", "Go to Map Page"),
     )
 
