@@ -1,12 +1,14 @@
 from ipyleaflet import Choropleth, Map, GeoJSON, Popup, Marker
 from shapely.geometry import Point, Polygon
 from shiny import App, ui, render, reactive
-from shinywidgets import output_widget, render_widget  
+from shinywidgets import output_widget, render_widget, render_plotly  
 from branca.colormap import linear
 import json
 import pandas as pd
 import numpy as np
 from IPython.display import display, IFrame
+import plotly.express as px
+import matplotlib.pyplot as plt
 
 
 
@@ -100,14 +102,32 @@ def create_map(selected_country):
     m.on_interaction(handle_click)    
     return m
 
+######################################
+### some dumy random data to test ###
+dummy_data = pd.DataFrame({
+    "variable_1": [1, 2, 2, 3, 4],
+    "variable_2": [5, 6, 7, 8, 9]
+})
+
+
+
+def histogram_plot(selected_var):
+    fig = px.histogram(dummy_data, x=selected_var)
+    #fig.show()
+    return fig
+
 
 def country_details(country):
     return ui.page_fluid(
         ui.input_action_button("show_map_page", "Go Back to Map Page"),
         ui.h2(f"Welcome to the country details Page for {country}!"),
         ui.p(f"Happiness score for {country} = {mapping[country]}"),
-
-        # ui.input_action_button("show_map", "Go to Map Page"),
+        ui.input_select("var", "Select variable", choices=["variable_1", "variable_2"]),
+        # output_widget("histogram"),  
+        ui.layout_columns(
+           ui.column(6, output_widget("histogram")),
+            ui.column(6, ui.h2(f"Extra detail for {country}!")) 
+        ),
     )
 
 
@@ -128,6 +148,13 @@ def server(input, output, session):
         if selected_country.get():
             page.set("country_details")
     
+ 
+    @output
+    @render_plotly
+    def histogram(): 
+        selected_var = input.var() #dummy_data["variable_1"]    
+        return histogram_plot(selected_var)
+        # return histogram_plot()
 
     @output
     @render.ui
