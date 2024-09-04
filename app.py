@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from IPython.display import display, IFrame
 import plotly.express as px
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 
 
@@ -110,7 +110,6 @@ dummy_data = pd.DataFrame({
 })
 
 
-
 def histogram_plot(selected_var):
     fig = px.histogram(dummy_data, x=selected_var)
     #fig.show()
@@ -187,10 +186,19 @@ def server(input, output, session):
 
 
 
-
 app_ui = ui.page_fluid(
-    ui.output_ui("map_ui"),
-    ui.output_ui("country_details_ui"),
+    ui.navset_pill(  
+        ui.nav_panel("Data", 
+                      ui.output_ui("map_ui"),
+                      ui.output_ui("country_details_ui"),),
+        ui.nav_panel("Download"),
+        ui.nav_panel("About",
+                      ui.h2("About This Application"),
+                      ui.p("This application is designed to..."),
+                      ),
+        id="tab",
+    ),  
+
     # output_widget("map"),
 )
 
