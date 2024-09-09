@@ -5,7 +5,30 @@
 
   .leaflet-container {
     background-color: rgb(255, 255, 255) !important;
+    margin-top: 50px;
   }
+
+  /* Custom styling for the navigation tabs */
+.custom-nav-tabs {
+    position: relative;
+    /* display: flex;
+    justify-content: flex-end; */
+    margin-top: 50px;  /* Pushes the navigation tabs down */
+    text-align: left; /* Aligns the tabs to the right */
+    padding-right: 50px; /* Adds padding to move the tabs away from the right edge */
+}
+
+/* Adjust the styling of individual tab buttons, if needed */
+.custom-nav-tabs .nav-link {
+    margin-left: 10px; /* Adds space between tabs */
+}
+
+/* If needed, you can adjust the look of the active tab */
+.custom-nav-tabs .nav-link.active {
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+}
+
 
   /* .polygon-layer {
     position: relative;
