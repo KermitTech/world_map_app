@@ -8,23 +8,65 @@ import json
 import plotly.express as px
 import pandas as pd
 from htmltools import head_content
+import country_converter as coco
+
+
+#########################################
+########### Excel DATA ##################
+
+df_disarm = pd.read_excel("data/disarm_2022-03-11.xlsx")
+print(df_disarm.head())
+
+## Using the first row values of df dataframe as the column names of the new_df.
+headers = df_disarm.iloc[0]
+new_df_disarm  = pd.DataFrame(df_disarm.values[1:], columns=headers)
+new_df_disarm = new_df_disarm.dropna(subset=['ID'])
+# print(new_df_disarm)
+# print(new_df_disarm.columns)
+# print(new_df_disarm[new_df_disarm['gwno'] =='700'])
+
+##### doblicate the columns with gwno of the type ... , ....
+new_df_disarm['gwno'] = new_df_disarm['gwno'].str.split(', ')
+# print(new_df_disarm[new_df_disarm['ID'] == 141])
+
+new_df_disarm = new_df_disarm.explode('gwno').reset_index(drop=True)
+# print(new_df_disarm[new_df_disarm['ID'] == 141])
+
+new_df_disarm['ID'] = new_df_disarm.groupby('ID').cumcount() + 1 + (new_df_disarm['ID'] * 10)
+# print(new_df_disarm[new_df_disarm['ID'] == 1412])
+
+####### adding ISO3 and short country name columns ######### 
+converter = coco.CountryConverter()
+
+gwcodes = new_df_disarm['gwno']
+# print(gwcodes)
+
+ISO3column = converter.convert(names=gwcodes, src="GWcode", to="ISO3")
+shortCountryName = converter.convert(names=gwcodes, src="GWcode", to="name_short")
+#  print(ISO3column)
+idx = 5 
+
+new_df_disarm.insert(loc=idx, column='ISO3', value = ISO3column)
+new_df_disarm.insert(loc=idx+1, column='country_name', value = shortCountryName)
+print(new_df_disarm['country_name'])
 
 #########################################
 ############ Polygon DATA ###############
 geOdf = gpd.read_file('data/world-administrative-boundaries.kml')
-print(geOdf.head())
+# print(geOdf.head())
 
 geo_json_data = geOdf.to_json()
 data_json=json.loads(geo_json_data)
+
 # for feature in data_json['features']:
 #     name = feature['properties']['Name'] 
 #     polygon = feature['geometry']['type']  # Access the 'Name' key within 'properties'
 
-
+##########################################
 
 def create_map(selected_country):
 
-    m = Map(zoom=1)
+    m = Map(zoom=2)
     m.layout.height="600px"
 
     m.layers = ()
@@ -48,7 +90,7 @@ def create_map(selected_country):
     
     m.add_layer(layer)
 
-       # Utility function to check if a point is inside a polygon
+    # Utility function to check if a point is inside a polygon
     def point_in_polygon(point, polygon):
         point = Point(point[1], point[0])  # Longitude, Latitude
         poly = Polygon(polygon)
@@ -186,23 +228,42 @@ def server(input, output, session):
         
 
 
+# app_ui = ui.page_fluid(
+#     ui.head_content(ui.include_css("styles.css")), 
+#     ui.navset_pill(  
+#         ui.nav_panel("Data", 
+            
+#             ui.div(ui.output_ui("map_ui"), class_="leaflet-container"),     
+#             ui.output_ui("country_details_ui"), 
+#         ),          
+#             ui.nav_panel("Download"),
+#             ui.nav_panel("About",
+#                         ui.h2("About This Application"),
+#                         ui.p("This application is designed to..."),
+#                         ),
+#         id="tab",
+#         class_="custom-nav-tabs"
+#        )   
+# )
+
 app_ui = ui.page_fluid(
     ui.head_content(ui.include_css("styles.css")), 
-    ui.navset_pill(  
-        ui.nav_panel("Data", 
-            
-            ui.div(ui.output_ui("map_ui"), class_="leaflet-container"),     
-            ui.output_ui("country_details_ui"), 
-        ),          
-            ui.nav_panel("Download"),
-            ui.nav_panel("About",
-                        ui.h2("About This Application"),
-                        ui.p("This application is designed to..."),
-                        ),
-        id="tab",
-       )   
+    ui.div(
+        ui.navset_pill(  
+            ui.nav_panel("Data", 
+                
+                ui.div(ui.output_ui("map_ui"), class_="leaflet-container"),     
+                ui.output_ui("country_details_ui"), 
+            ),          
+                ui.nav_panel("Download"),
+                ui.nav_panel("About",
+                            ui.h2("About This Application"),
+                            ui.p("This application is designed to..."),
+                            ),
+            id="tab",
+        ),
+        class_="custom-nav-tabs" 
+    )  
 )
-
-
 
 app = App(app_ui, server)
