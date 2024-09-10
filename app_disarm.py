@@ -15,7 +15,7 @@ import country_converter as coco
 ########### Excel DATA ##################
 
 df_disarm = pd.read_excel("data/disarm_2022-03-11.xlsx")
-print(df_disarm.head())
+# print(df_disarm.head())
 
 ## Using the first row values of df dataframe as the column names of the new_df.
 headers = df_disarm.iloc[0]
@@ -38,17 +38,47 @@ new_df_disarm['ID'] = new_df_disarm.groupby('ID').cumcount() + 1 + (new_df_disar
 ####### adding ISO3 and short country name columns ######### 
 converter = coco.CountryConverter()
 
-gwcodes = new_df_disarm['gwno']
-# print(gwcodes)
+# gwcodes = new_df_disarm['gwno']
+# # print(gwcodes)
 
-ISO3column = converter.convert(names=gwcodes, src="GWcode", to="ISO3")
-shortCountryName = converter.convert(names=gwcodes, src="GWcode", to="name_short")
-#  print(ISO3column)
-idx = 5 
+# ISO3column = converter.convert(names=gwcodes, src="GWcode", to="ISO3")
+# shortCountryName = converter.convert(names=gwcodes, src="GWcode", to="name_short")
+# #  print(ISO3column)
+# idx = 5 
 
-new_df_disarm.insert(loc=idx, column='ISO3', value = ISO3column)
-new_df_disarm.insert(loc=idx+1, column='country_name', value = shortCountryName)
-print(new_df_disarm['country_name'])
+# new_df_disarm.insert(loc=idx, column='ISO3', value = ISO3column)
+# new_df_disarm.insert(loc=idx+1, column='country_name', value = shortCountryName)
+# print(new_df_disarm['country_name'])
+
+########## Some aggregations on the data
+### number of peace agreements per country
+
+no_distinct_gwno = new_df_disarm['gwno'].nunique()
+# print(no_distinct_gwno)
+
+counts_pa_perCountry = new_df_disarm.groupby('gwno')['pa_name'].count()
+
+### converting counts_pa_perCountry (it is a series) into a dataframe
+counts_pa_perCountry_df = counts_pa_perCountry.reset_index()
+
+### change the pa_column name
+counts_pa_perCountry_df = counts_pa_perCountry_df.rename(columns={"pa_name":"pa_counts"}) 
+
+#### convert the gwno code to iso3 and short country name
+iso3 = converter.convert(names=counts_pa_perCountry_df['gwno'], src="GWcode", to="ISO3")
+short_country_name = converter.convert(names=counts_pa_perCountry_df['gwno'], src="GWcode", to="name_short")
+
+#### insert the new columns into the dataframe counts_pa_perCountry_df
+counts_pa_perCountry_df.insert(loc=1, column='ISO3', value = iso3)
+counts_pa_perCountry_df.insert(loc=2, column='country_name', value = short_country_name)
+
+#### removed south Yemen
+counts_pa_perCountry_df = counts_pa_perCountry_df.drop(counts_pa_perCountry_df[counts_pa_perCountry_df['gwno'] == '678'].index)
+# print(counts_pa_perCountry_df)
+
+mapping  = dict(zip(counts_pa_perCountry_df['ISO3'].str.strip(), counts_pa_perCountry_df['pa_counts']))
+# print(mapping)
+
 
 #########################################
 ############ Polygon DATA ###############
@@ -56,11 +86,45 @@ geOdf = gpd.read_file('data/world-administrative-boundaries.kml')
 # print(geOdf.head())
 
 geo_json_data = geOdf.to_json()
-data_json=json.loads(geo_json_data)
+data_json=json.loads(geo_json_data) ## this is converting a json string into a dictionary
+
+#### We need to make a new column named "Name" to use as key_on
+for d in data_json["features"]:
+    d["Name"] = d["properties"]["Name"]
+
+# print(data_json)
+
+# res = list(data_json.keys())[1]
+# print(res) # res = type or features 
 
 # for feature in data_json['features']:
 #     name = feature['properties']['Name'] 
 #     polygon = feature['geometry']['type']  # Access the 'Name' key within 'properties'
+
+##########################################
+### Making sure that the iso3 values in the geo data is the same as the iso3 in 
+### the Excel file
+
+# for d in data_json["features"]:
+#     if d["properties"]["Name"] not in mapping:
+#             mapping[d["properties"]["Name"]] = 0
+
+for d in data_json["features"]:
+    if d["Name"] not in mapping:
+            mapping[d["Name"]] = 0
+
+
+# for d in data_json["features"]:
+#     print(d["properties"])
+    # if d["properties"]["Name"] not in mapping:
+
+# print(data_json["features"][0]["properties"]["Name"])  # Should print 'UGA'
+# print(mapping) 
+        
+#         if d["name"] in proper_name_mapping.keys():
+#             mapping[d["name"]] = mapping[proper_name_mapping[d["name"]]]
+#         else:
+#             mapping[d["name"]] = 0
 
 ##########################################
 
@@ -71,24 +135,40 @@ def create_map(selected_country):
 
     m.layers = ()
 
-    solid_background = Rectangle(
-        bounds=[[-60, -300], [100, 185]],  # Covers the entire map
-        color="white",
-        fill_color="white",
-        fill_opacity=1.0,
-    )
+    # solid_background = Rectangle(
+    #     bounds=[[-60, -300], [100, 185]],  # Covers the entire map
+    #     color="white",
+    #     fill_color="white",
+    #     fill_opacity=1.0,
+    # )
 
     # m.add_layer(solid_background)
 
-    layer = GeoJSON(
-            data=json.loads(geo_json_data),
-            colormap=linear.Blues_05,
-            style={'color': 'black', 'fillColor': '#3366cc', 'opacity':0.05, 'weight':1.9, 'dashArray':'2', 'fillOpacity':0.6},
-            # style={'fillOpacity': 1.0, "color":"white", 'fillColor': 'green'},
-            hover_style={'fillColor': 'red' , 'fillOpacity': 0.2},
-            key_on="name") 
+    layer = Choropleth(
+        # geo_data=json.loads(geo_json_data),
+        geo_data=data_json,
+        choro_data=mapping,
+        #columns=["Name", "value"],  
+        colormap=linear.Blues_05,
+        # style={'color': 'black', 'fillColor': '#3366cc', 'opacity':0.05, 'weight':1.9, 'dashArray':'2', 'fillOpacity':0.6},
+        style={'fillOpacity': 1.0, "color":"black"},
+        key_on="Name", 
+        # key_on="features.properties.Name"
+        hover_style={'fillColor': 'red' , 'fillOpacity': 0.2}
+        ) 
     
     m.add_layer(layer)
+
+    # layer = GeoJSON(
+    #         data=json.loads(geo_json_data),
+    #         colormap=linear.Blues_05,
+    #         style={'color': 'black', 'fillColor': '#3366cc', 'opacity':0.05, 'weight':1.9, 'dashArray':'2', 'fillOpacity':0.6},
+    #         # style={'fillOpacity': 1.0, "color":"white", 'fillColor': 'green'},
+    #         hover_style={'fillColor': 'red' , 'fillOpacity': 0.2},
+    #         # key_on="name"
+    #         ) 
+    
+    # m.add_layer(layer)
 
     # Utility function to check if a point is inside a polygon
     def point_in_polygon(point, polygon):
@@ -99,7 +179,7 @@ def create_map(selected_country):
     def handle_click(**kwargs):
         if kwargs.get('type') == 'click':
             coordinates = kwargs.get('coordinates')
-            print(coordinates)
+            # print(coordinates)
             if coordinates:
                 # Identify the country by checking the GeoJSON data
                 clicked_country = None
@@ -117,7 +197,7 @@ def create_map(selected_country):
 
                 if clicked_country:
                     selected_country.set(clicked_country)
-                    print(selected_country)
+                    # print(selected_country)
 
     m.on_interaction(handle_click)   
 
