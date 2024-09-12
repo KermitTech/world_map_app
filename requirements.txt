@@ -1,0 +1,10 @@
+ipyleaflet
+shapely
+shiny
+shinywidgets
+pandas
+plotly
+geopandas
+htmltools
+country_converter
+openpyxl
