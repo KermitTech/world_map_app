@@ -4,6 +4,7 @@
   } */
 
   .leaflet-container {
+    position: relative;
     background-color: rgb(255, 255, 255) !important;
     margin-top: 50px;
   }
@@ -13,62 +14,140 @@
     position: relative;
     /* display: flex;
     justify-content: flex-end; */
-    margin-top: 50px;  /* Pushes the navigation tabs down */
-    text-align: left; /* Aligns the tabs to the right */
-    padding-right: 50px; /* Adds padding to move the tabs away from the right edge */
+    margin-top: 50px;  
+    text-align: left; 
+    padding-right: 50px; 
 }
 
 /* Adjust the styling of individual tab buttons, if needed */
 .custom-nav-tabs .nav-link {
-    margin-left: 10px; /* Adds space between tabs */
+    margin-left: 10px; 
 }
 
-/* If needed, you can adjust the look of the active tab */
+/* Adjust the look of the active tab */
 .custom-nav-tabs .nav-link.active {
     font-weight: bold;
     color: rgb(255, 255, 255);
 }
 
 
-  /* .polygon-layer {
+/* styling the legend */
+.legend {
     position: relative;
-    z-index: 2;  /* Ensures the polygon layer is on top */
-    /* width: 100%;
-    height: 100%;
-} */ 
+    bottom: 10px;
+    left: 100px;
+    /* padding: 10px; */
+    background-color: white;
+    /* border: 1px solid #ccc; */
+    /* z-index: 9999;  */
+    max-width: 250px; 
+    /* overflow-wrap: break-word; */
+}
 
- /* Ensure the background covers the entire page */
-/* .background-layer {
-    position: absolute; Make it fill the whole viewport */
-    /* top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: purple; /* Your desired background color */
-    /* z-index: 0; Behind everything
-} */ 
+.legend h4 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    font-weight: bold;
+}
 
-/* The map container should be on top of the background */
-/* .map-container {
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1; Above the background */
-/* } */
 
-/* The polygon layer should be on top of the map */
-/* .polygon-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%; */
-    /* z-index: 2; /* Above the map */
-/* } */ 
+/* Stylying the elements of the country details page*/
+/* General Layout */
+.country-details-container {
+    /* margin: 20px auto; */
+    margin-top: 50px;
+    padding: 30px;
+    max-width: 1900px; 
+    min-height: 800px;
+    background-color: #e1bfbf;
+    /* border-radius: 10px; */
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+}
 
-/* .ui-content {
-    position: relative; */
-    /* z-index: 3; Ensure UI content is on top */
-/* } */
+/* Section Titles */
+.country-details-title {
+    font-size: 28px;
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center; /* Center align the title */
+}
+
+.country-details-list {
+    margin-top: 140px;
+    width: 300px; 
+    height: 60px; 
+    padding: 8px 12px; 
+    font-size: 20px; 
+    font-family: "JetBrains Mono", monospace; 
+    color: #030101; 
+    /* background-color: rgb(255, 255, 255);  */
+    /* border: 2px solid rgb(255, 255, 255);  */
+    /* border-radius: 5px; 
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);  */
+    /* appearance: none; 
+    cursor: pointer;
+    transition: all 0.3s ease; Smooth transitions */
+}
+
+
+.country-details-table td {
+    background-color: #fff;
+    color: #555;
+} */
+
+
+/* Map button in the country details page*/
+.country-details-btn {
+  align-items: center;
+  appearance: none;
+  background-image: radial-gradient(100% 100% at 100% 0, #5adaff 0, #5468ff 100%);
+  border: 0;
+  border-radius: 6px;
+  box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: "JetBrains Mono",monospace;
+  height: 48px;
+  justify-content: center;
+  line-height: 1;
+  list-style: none;
+  overflow: hidden;
+  padding-left: 16px;
+  padding-right: 16px;
+  position: relative;
+  text-align: left;
+  text-decoration: none;
+  transition: box-shadow .15s,transform .15s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
+  will-change: box-shadow,transform;
+  font-size: 18px;
+}
+
+.country-details-btn:focus {
+  box-shadow: #3c4fe0 0 0 0 1.5px inset, rgba(45, 35, 66, .4) 0 2px 4px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #3c4fe0 0 -3px 0 inset;
+}
+
+.country-details-btn:hover {
+  box-shadow: rgba(45, 35, 66, .4) 0 4px 8px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #3c4fe0 0 -3px 0 inset;
+  transform: translateY(-2px);
+}
+
+.country-details-btn:active {
+  box-shadow: #3c4fe0 0 3px 7px inset;
+  transform: translateY(2px);
+}
+
+
+
+
+
+
+
+
+
