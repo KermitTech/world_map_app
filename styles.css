@@ -51,6 +51,17 @@
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
 /* Stylying the elements of the country details page*/
 /* General Layout */
 .country-details-container {
@@ -73,6 +84,7 @@
     text-align: center; /* Center align the title */
 }
 
+
 .country-details-list {
     margin-top: 140px;
     width: 300px; 
@@ -91,13 +103,7 @@
 }
 
 
-.country-details-table td {
-    background-color: #fff;
-    color: #555;
-} */
-
-
-/* Map button in the country details page*/
+/* Map page button*/
 .country-details-btn {
   align-items: center;
   appearance: none;
@@ -142,12 +148,5 @@
   box-shadow: #3c4fe0 0 3px 7px inset;
   transform: translateY(2px);
 }
-
-
-
-
-
-
-
 
 
