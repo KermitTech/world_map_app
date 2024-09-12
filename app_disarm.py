@@ -1,4 +1,4 @@
-from ipyleaflet import Choropleth, Map, GeoJSON, GeoData, Popup, Marker, basemaps, TileLayer, LayersControl, Rectangle
+from ipyleaflet import Choropleth, Map, LegendControl, GeoJSON, GeoData, Popup, Marker, basemaps, TileLayer, LayersControl, Rectangle
 from shapely.geometry import Point, Polygon
 from shiny import App, ui, render, reactive
 from shinywidgets import output_widget, render_widget, render_plotly 
@@ -9,6 +9,7 @@ import plotly.express as px
 import pandas as pd
 from htmltools import head_content
 import country_converter as coco
+from legend import create_legend
 
 
 #########################################
@@ -25,7 +26,7 @@ new_df_disarm = new_df_disarm.dropna(subset=['ID'])
 # print(new_df_disarm.columns)
 # print(new_df_disarm[new_df_disarm['gwno'] =='700'])
 
-##### doblicate the columns with gwno of the type ... , ....
+##### duplicate the columns with gwno of the type ... , ....
 new_df_disarm['gwno'] = new_df_disarm['gwno'].str.split(', ')
 # print(new_df_disarm[new_df_disarm['ID'] == 141])
 
@@ -38,17 +39,18 @@ new_df_disarm['ID'] = new_df_disarm.groupby('ID').cumcount() + 1 + (new_df_disar
 ####### adding ISO3 and short country name columns ######### 
 converter = coco.CountryConverter()
 
-# gwcodes = new_df_disarm['gwno']
+gwcodes = new_df_disarm['gwno']
 # # print(gwcodes)
 
-# ISO3column = converter.convert(names=gwcodes, src="GWcode", to="ISO3")
-# shortCountryName = converter.convert(names=gwcodes, src="GWcode", to="name_short")
+ISO3column = converter.convert(names=gwcodes, src="GWcode", to="ISO3")
+shortCountryName = converter.convert(names=gwcodes, src="GWcode", to="name_short")
 # #  print(ISO3column)
-# idx = 5 
+idx = 5 
 
-# new_df_disarm.insert(loc=idx, column='ISO3', value = ISO3column)
-# new_df_disarm.insert(loc=idx+1, column='country_name', value = shortCountryName)
+new_df_disarm.insert(loc=idx, column='ISO3', value = ISO3column)
+new_df_disarm.insert(loc=idx+1, column='country_name', value = shortCountryName)
 # print(new_df_disarm['country_name'])
+
 
 ########## Some aggregations on the data
 ### number of peace agreements per country
@@ -145,19 +147,25 @@ def create_map(selected_country):
     # m.add_layer(solid_background)
 
     layer = Choropleth(
-        # geo_data=json.loads(geo_json_data),
         geo_data=data_json,
-        choro_data=mapping,
-        #columns=["Name", "value"],  
-        colormap=linear.Blues_05,
-        # style={'color': 'black', 'fillColor': '#3366cc', 'opacity':0.05, 'weight':1.9, 'dashArray':'2', 'fillOpacity':0.6},
+        choro_data=mapping,  
+        colormap=linear.Paired_03,   ## Blues_03, Paired_03, PRGn_03
         style={'fillOpacity': 1.0, "color":"black"},
         key_on="Name", 
-        # key_on="features.properties.Name"
         hover_style={'fillColor': 'red' , 'fillOpacity': 0.2}
         ) 
     
     m.add_layer(layer)
+
+    # legend = create_legend()
+    # m.add_control(legend)
+
+    # legend = LegendControl({"low":"#FAA", "medium":"#A55", "High":"#500"}, title="Legend", position="bottomright")
+    # legend.title = "Risk"  # Set title
+    # legend.title 
+    # legend.position = "bottomleft"  # Set position
+    # legend.position
+    # m.add(legend)
 
     # layer = GeoJSON(
     #         data=json.loads(geo_json_data),
@@ -210,44 +218,85 @@ def create_map(selected_country):
 
 ######################################
 ### some dumy random data to test ###
-dummy_data = pd.DataFrame({
-    "variable_1": [1, 2, 2, 3, 4],
-    "variable_2": [5, 6, 7, 8, 9]
-})
+# dummy_data = pd.DataFrame({
+#     "variable_1": [1, 2, 2, 3, 4],
+#     "variable_2": [5, 6, 7, 8, 9]
+# })
 
 
-def histogram_plot(selected_var):
-    fig = px.histogram(dummy_data, x=selected_var)
-    #fig.show()
-    fig.update_layout(
-            title={
-                # 'text': "Count of The Incident",
-                'y': 0.9,
-                'x': 0.5,
-                'xanchor': 'center',
-                'yanchor': 'top'
-            },
-            font=dict(
-                size=18,
-                color="RebeccaPurple"
-            )
-    )
-    return fig
+# def histogram_plot(selected_var):
+#     fig = px.histogram(dummy_data, x=selected_var)
+#     #fig.show()
+#     fig.update_layout(
+#             title={
+#                 # 'text': "Count of The Incident",
+#                 'y': 0.9,
+#                 'x': 0.5,
+#                 'xanchor': 'center',
+#                 'yanchor': 'top'
+#             },
+#             font=dict(
+#                 size=18,
+#                 color="RebeccaPurple"
+#             )
+#     )
+#     return fig
 
 
+# def country_details(country):
+#     return ui.page_fluid(
+#         ui.input_action_button("show_map_page", "Go Back to Map Page"),
+#         ui.h2(f"Welcome to the country details Page for {country}!"),
+#         ui.p(f"Happiness score for {country} "), # = {mapping[country]}
+#         ui.input_select("var", "Select variable", choices=["variable_1", "variable_2"]),
+#         # output_widget("histogram"),  
+#         ui.layout_columns(
+#            ui.column(6, output_widget("histogram")),
+#             ui.column(6, ui.h2(f"Extra detail for {country}!")) 
+#         ),
+#     )
+
+##### Data to be shown in the details country page after selecting an agreement
+# print(new_df_disarm['pa_date'])
+# print(new_df_disarm['conflict_name'])
+# print(new_df_disarm['pa_comment'])
+# ui.output_data_frame("penguins_df"),
+
+def table_details_country(selected_option):
+    try:
+        if selected_option is not None and 0 <= int(selected_option) < len(new_df_disarm):   #selected_option in new_df_disarm['pa_name'].values: #== new_df_disarm[new_df_disarm['pa_name']].index:
+            # print(1)
+            df = new_df_disarm.iloc[[selected_option]][['pa_date', 'conflict_name', 'pa_comment']]
+            df = df.rename(columns={'pa_date': 'Agreement Date', 'conflict_name': 'Conflict Name', 'pa_comment':'Comment'})
+        else:
+            df = pd.DataFrame(columns=['Agreement Date', 'Conflict Name', 'Comment'])
+        
+        # print(df)
+    except ValueError:
+        # Handle case where selected_option is not an integer
+        df = pd.DataFrame(columns=['Agreement Date', 'Conflict Name', 'Comment'])
+    return df
+
+
+##### UIs
+##### country details ui
 def country_details(country):
-    return ui.page_fluid(
-        ui.input_action_button("show_map_page", "Go Back to Map Page"),
-        ui.h2(f"Welcome to the country details Page for {country}!"),
-        ui.p(f"Happiness score for {country} "), # = {mapping[country]}
-        ui.input_select("var", "Select variable", choices=["variable_1", "variable_2"]),
-        # output_widget("histogram"),  
-        ui.layout_columns(
-           ui.column(6, output_widget("histogram")),
-            ui.column(6, ui.h2(f"Extra detail for {country}!")) 
-        ),
-    )
 
+    pa_name = new_df_disarm[new_df_disarm['ISO3']==country]['pa_name']
+    print(pa_name)
+    
+    # iso3 = converter.convert(names=counts_pa_perCountry_df['gwno'], src="GWcode", to="ISO3")
+    ui_details = ui.div(ui.page_fluid(
+        ui.input_action_button("show_map_page", "Map Page", class_= 'country-details-btn'),
+        ui.h2(f"Welcome to the country details Page for {country}!", class_="country-details-title"), 
+        ui.layout_columns(
+            ui.column(4,ui.div(ui.input_selectize("var", "Select an agreement:", choices=pa_name), class_="country-details-list")),
+            ui.column(8, ui.output_data_frame("table_agreement")), 
+            )
+        ), class_="country-details-container"
+    ) 
+    return ui_details 
+    
 
 
 
@@ -269,12 +318,23 @@ def server(input, output, session):
             page.set("country_details")
     
  
+    # @output
+    # @render_plotly
+    # def histogram(): 
+    #     selected_var = input.var() #dummy_data["variable_1"]    
+    #     return histogram_plot(selected_var)
+    #     # return histogram_plot()
+
+
     @output
-    @render_plotly
-    def histogram(): 
-        selected_var = input.var() #dummy_data["variable_1"]    
-        return histogram_plot(selected_var)
-        # return histogram_plot()
+    @render.data_frame 
+    def table_agreement():
+        selected_option = input.var()
+        df = table_details_country(selected_option)
+        print(f"Selected Option: {selected_option}")
+        # print(df)
+        return render.DataTable(df)
+
 
     @output
     @render.ui
@@ -303,7 +363,9 @@ def server(input, output, session):
     def map_ui():
         if page.get() == "map":
             return ui.page_fluid(
-                output_widget("map")
+                ui.div(output_widget("map"), 
+                ui.div(ui.HTML(create_legend(mapping)), class_="legend"),
+                class_="leaflet-container"), 
             )
         
 
@@ -331,9 +393,9 @@ app_ui = ui.page_fluid(
     ui.div(
         ui.navset_pill(  
             ui.nav_panel("Data", 
-                
-                ui.div(ui.output_ui("map_ui"), class_="leaflet-container"),     
+                ui.output_ui("map_ui"),     
                 ui.output_ui("country_details_ui"), 
+                
             ),          
                 ui.nav_panel("Download"),
                 ui.nav_panel("About",
@@ -345,5 +407,10 @@ app_ui = ui.page_fluid(
         class_="custom-nav-tabs" 
     )  
 )
+
+
+
+
+
 
 app = App(app_ui, server)
