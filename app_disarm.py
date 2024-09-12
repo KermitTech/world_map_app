@@ -96,39 +96,17 @@ for d in data_json["features"]:
 
 # print(data_json)
 
-# res = list(data_json.keys())[1]
-# print(res) # res = type or features 
-
-# for feature in data_json['features']:
-#     name = feature['properties']['Name'] 
-#     polygon = feature['geometry']['type']  # Access the 'Name' key within 'properties'
-
 ##########################################
 ### Making sure that the iso3 values in the geo data is the same as the iso3 in 
 ### the Excel file
-
-# for d in data_json["features"]:
-#     if d["properties"]["Name"] not in mapping:
-#             mapping[d["properties"]["Name"]] = 0
 
 for d in data_json["features"]:
     if d["Name"] not in mapping:
             mapping[d["Name"]] = 0
 
 
-# for d in data_json["features"]:
-#     print(d["properties"])
-    # if d["properties"]["Name"] not in mapping:
-
-# print(data_json["features"][0]["properties"]["Name"])  # Should print 'UGA'
-# print(mapping) 
-        
-#         if d["name"] in proper_name_mapping.keys():
-#             mapping[d["name"]] = mapping[proper_name_mapping[d["name"]]]
-#         else:
-#             mapping[d["name"]] = 0
-
 ##########################################
+### Map function 
 
 def create_map(selected_country):
 
@@ -136,15 +114,6 @@ def create_map(selected_country):
     m.layout.height="600px"
 
     m.layers = ()
-
-    # solid_background = Rectangle(
-    #     bounds=[[-60, -300], [100, 185]],  # Covers the entire map
-    #     color="white",
-    #     fill_color="white",
-    #     fill_opacity=1.0,
-    # )
-
-    # m.add_layer(solid_background)
 
     layer = Choropleth(
         geo_data=data_json,
@@ -157,15 +126,6 @@ def create_map(selected_country):
     
     m.add_layer(layer)
 
-    # legend = create_legend()
-    # m.add_control(legend)
-
-    # legend = LegendControl({"low":"#FAA", "medium":"#A55", "High":"#500"}, title="Legend", position="bottomright")
-    # legend.title = "Risk"  # Set title
-    # legend.title 
-    # legend.position = "bottomleft"  # Set position
-    # legend.position
-    # m.add(legend)
 
     # layer = GeoJSON(
     #         data=json.loads(geo_json_data),
@@ -216,51 +176,8 @@ def create_map(selected_country):
     return m
 
 
-######################################
-### some dumy random data to test ###
-# dummy_data = pd.DataFrame({
-#     "variable_1": [1, 2, 2, 3, 4],
-#     "variable_2": [5, 6, 7, 8, 9]
-# })
-
-
-# def histogram_plot(selected_var):
-#     fig = px.histogram(dummy_data, x=selected_var)
-#     #fig.show()
-#     fig.update_layout(
-#             title={
-#                 # 'text': "Count of The Incident",
-#                 'y': 0.9,
-#                 'x': 0.5,
-#                 'xanchor': 'center',
-#                 'yanchor': 'top'
-#             },
-#             font=dict(
-#                 size=18,
-#                 color="RebeccaPurple"
-#             )
-#     )
-#     return fig
-
-
-# def country_details(country):
-#     return ui.page_fluid(
-#         ui.input_action_button("show_map_page", "Go Back to Map Page"),
-#         ui.h2(f"Welcome to the country details Page for {country}!"),
-#         ui.p(f"Happiness score for {country} "), # = {mapping[country]}
-#         ui.input_select("var", "Select variable", choices=["variable_1", "variable_2"]),
-#         # output_widget("histogram"),  
-#         ui.layout_columns(
-#            ui.column(6, output_widget("histogram")),
-#             ui.column(6, ui.h2(f"Extra detail for {country}!")) 
-#         ),
-#     )
 
 ##### Data to be shown in the details country page after selecting an agreement
-# print(new_df_disarm['pa_date'])
-# print(new_df_disarm['conflict_name'])
-# print(new_df_disarm['pa_comment'])
-# ui.output_data_frame("penguins_df"),
 
 def table_details_country(selected_option):
     try:
@@ -278,7 +195,7 @@ def table_details_country(selected_option):
     return df
 
 
-##### UIs
+
 ##### country details ui
 def country_details(country):
 
@@ -317,13 +234,6 @@ def server(input, output, session):
         if selected_country.get():
             page.set("country_details")
     
- 
-    # @output
-    # @render_plotly
-    # def histogram(): 
-    #     selected_var = input.var() #dummy_data["variable_1"]    
-    #     return histogram_plot(selected_var)
-    #     # return histogram_plot()
 
 
     @output
@@ -370,23 +280,6 @@ def server(input, output, session):
         
 
 
-# app_ui = ui.page_fluid(
-#     ui.head_content(ui.include_css("styles.css")), 
-#     ui.navset_pill(  
-#         ui.nav_panel("Data", 
-            
-#             ui.div(ui.output_ui("map_ui"), class_="leaflet-container"),     
-#             ui.output_ui("country_details_ui"), 
-#         ),          
-#             ui.nav_panel("Download"),
-#             ui.nav_panel("About",
-#                         ui.h2("About This Application"),
-#                         ui.p("This application is designed to..."),
-#                         ),
-#         id="tab",
-#         class_="custom-nav-tabs"
-#        )   
-# )
 
 app_ui = ui.page_fluid(
     ui.head_content(ui.include_css("styles.css")), 
