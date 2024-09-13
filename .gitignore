@@ -3,4 +3,4 @@ custom_geo.json
 .venv
 test
 data
-map.py
+app.py
