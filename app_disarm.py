@@ -10,7 +10,9 @@ import pandas as pd
 from htmltools import head_content
 import country_converter as coco
 from legend import create_legend
-
+from map import create_map
+from country_details_ui import country_details
+# from agreement_ui import table_details_country
 
 #########################################
 ########### Excel DATA ##################
@@ -105,117 +107,6 @@ for d in data_json["features"]:
             mapping[d["Name"]] = 0
 
 
-##########################################
-### Map function 
-
-def create_map(selected_country):
-
-    m = Map(zoom=2)
-    m.layout.height="600px"
-
-    m.layers = ()
-
-    layer = Choropleth(
-        geo_data=data_json,
-        choro_data=mapping,  
-        colormap=linear.Paired_03,   ## Blues_03, Paired_03, PRGn_03
-        style={'fillOpacity': 1.0, "color":"black"},
-        key_on="Name", 
-        hover_style={'fillColor': 'red' , 'fillOpacity': 0.2}
-        ) 
-    
-    m.add_layer(layer)
-
-
-    # layer = GeoJSON(
-    #         data=json.loads(geo_json_data),
-    #         colormap=linear.Blues_05,
-    #         style={'color': 'black', 'fillColor': '#3366cc', 'opacity':0.05, 'weight':1.9, 'dashArray':'2', 'fillOpacity':0.6},
-    #         # style={'fillOpacity': 1.0, "color":"white", 'fillColor': 'green'},
-    #         hover_style={'fillColor': 'red' , 'fillOpacity': 0.2},
-    #         # key_on="name"
-    #         ) 
-    
-    # m.add_layer(layer)
-
-    # Utility function to check if a point is inside a polygon
-    def point_in_polygon(point, polygon):
-        point = Point(point[1], point[0])  # Longitude, Latitude
-        poly = Polygon(polygon)
-        return poly.contains(point)
-
-    def handle_click(**kwargs):
-        if kwargs.get('type') == 'click':
-            coordinates = kwargs.get('coordinates')
-            # print(coordinates)
-            if coordinates:
-                # Identify the country by checking the GeoJSON data
-                clicked_country = None
-                # for feature in geo_json_data['features']:
-                for feature in data_json['features']:
-                    if feature['geometry']['type'] == 'Polygon':
-                        if point_in_polygon(coordinates, feature['geometry']['coordinates'][0]):
-                            clicked_country = feature['properties']['Name']
-                            break
-                    elif feature['geometry']['type'] == 'MultiPolygon':
-                        for polygon in feature['geometry']['coordinates']:
-                            if point_in_polygon(coordinates, polygon[0]):
-                                clicked_country = feature['properties']['Name']
-                                break
-
-                if clicked_country:
-                    selected_country.set(clicked_country)
-                    # print(selected_country)
-
-    m.on_interaction(handle_click)   
-
-
-    layer.on_click(handle_click)
-
-
-    return m
-
-
-
-##### Data to be shown in the details country page after selecting an agreement
-
-def table_details_country(selected_option):
-    try:
-        if selected_option is not None and 0 <= int(selected_option) < len(new_df_disarm):   #selected_option in new_df_disarm['pa_name'].values: #== new_df_disarm[new_df_disarm['pa_name']].index:
-            # print(1)
-            df = new_df_disarm.iloc[[selected_option]][['pa_date', 'conflict_name', 'pa_comment']]
-            df = df.rename(columns={'pa_date': 'Agreement Date', 'conflict_name': 'Conflict Name', 'pa_comment':'Comment'})
-        else:
-            df = pd.DataFrame(columns=['Agreement Date', 'Conflict Name', 'Comment'])
-        
-        # print(df)
-    except ValueError:
-        # Handle case where selected_option is not an integer
-        df = pd.DataFrame(columns=['Agreement Date', 'Conflict Name', 'Comment'])
-    return df
-
-
-
-##### country details ui
-def country_details(country):
-
-    pa_name = new_df_disarm[new_df_disarm['ISO3']==country]['pa_name']
-    print(pa_name)
-    
-    # iso3 = converter.convert(names=counts_pa_perCountry_df['gwno'], src="GWcode", to="ISO3")
-    ui_details = ui.div(ui.page_fluid(
-        ui.input_action_button("show_map_page", "Map Page", class_= 'country-details-btn'),
-        ui.h2(f"Welcome to the country details Page for {country}!", class_="country-details-title"), 
-        ui.layout_columns(
-            ui.column(4,ui.div(ui.input_selectize("var", "Select an agreement:", choices=pa_name), class_="country-details-list")),
-            ui.column(8, ui.output_data_frame("table_agreement")), 
-            )
-        ), class_="country-details-container"
-    ) 
-    return ui_details 
-    
-
-
 
 def server(input, output, session):
 
@@ -235,39 +126,58 @@ def server(input, output, session):
             page.set("country_details")
     
 
+    ##########################################
+    ### Agreement details ui
 
-    @output
-    @render.data_frame 
-    def table_agreement():
-        selected_option = input.var()
-        df = table_details_country(selected_option)
-        print(f"Selected Option: {selected_option}")
-        # print(df)
-        return render.DataTable(df)
+    # @output
+    # @render.data_frame 
+    # def table_agreement():
+    #     selected_option = input.var()
+    #     df = new_df_disarm
+    #     df_details = table_details_country(selected_option, df)
+    #     # print(f"Selected Option: {selected_option}")
+    #     return render.DataTable(df_details)
+    
+    # @output
+    # @render.ui
+    # def agreement_details_ui():
 
+
+
+    ##########################################
+    ### Country details ui
 
     @output
     @render.ui
     def country_details_ui():
         if page.get() == "country_details":
             country = selected_country.get()
+            df = new_df_disarm
+            return country_details(country, df)
             # print(country)
-            if country:
-                return country_details(country)
-                # ui.input_action_button("show_map_page", "Go Back to Map Page"),
-            else:
-                return ui.page_fluid(
-                    ui.h2("No country selected"),
-                    ui.input_action_button("show_map_page", "Go Back to Map Page"),
-                )
+            # if country:
+            #     return country_details(country)
+            #     # ui.input_action_button("show_map_page", "Go Back to Map Page"),
+            # else:
+            #     return ui.page_fluid(
+            #         ui.h2("No country selected"),
+            #         ui.input_action_button("show_map_page", "Go Back to Map Page"),
+            #     )
        
-    
+    ##########################################
+    ### Map function 
+
     @output
     @render_widget
     def map():
-        return create_map(selected_country)
+        polygon_data = data_json
+        mapping_data = mapping
+        return create_map(selected_country, polygon_data, mapping_data)
         # return create_map()
-    
+
+    ##########################################
+    ### Map ui
+
     @output
     @render.ui
     def map_ui():
@@ -287,8 +197,7 @@ app_ui = ui.page_fluid(
         ui.navset_pill(  
             ui.nav_panel("Data", 
                 ui.output_ui("map_ui"),     
-                ui.output_ui("country_details_ui"), 
-                
+                ui.output_ui("country_details_ui")     
             ),          
                 ui.nav_panel("Download"),
                 ui.nav_panel("About",
