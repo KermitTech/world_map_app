@@ -1,24 +1,32 @@
-from ipyleaflet import Choropleth, Map, GeoJSON, Popup, Marker
-from shapely.geometry import Point, Polygon
-from shiny import App, ui, render, reactive
-from shinywidgets import output_widget, render_widget, render_plotly  
-from branca.colormap import linear
+from ipyleaflet import Choropleth, Map, GeoJSON, Popup, Marker  #1
+from shapely.geometry import Point, Polygon  #2
+from shiny import App, ui, render, reactive # 3
+from shinywidgets import output_widget, render_widget, render_plotly  #4
+from branca.colormap import linear #
 import json
 import pandas as pd
 import numpy as np
 from IPython.display import display, IFrame
 import plotly.express as px
 # import matplotlib.pyplot as plt
+import geopandas as gpd  # 5
 
 
+#########################################
+############ Polygon DATA ###############
+geOdf = gpd.read_file('data/world-administrative-boundaries.kml', driver='KML')
+# print(geOdf.head())
 
 happiness_report = pd.read_csv("world_happiness_2019.csv")
+print(happiness_report)
 
 
 with open('custom_geo.json', 'r') as f:
     geo_json_data = json.load(f)
     for d in geo_json_data["features"]:
         d["name"] = d["properties"]["name_sort"]
+
+print(geo_json_data)
 
 
 
@@ -59,6 +67,7 @@ for d in geo_json_data["features"]:
             mapping[d["name"]] = 0
 
 # print(mapping["Norway"])
+# print(mapping)
 
 def create_map(selected_country):
 
