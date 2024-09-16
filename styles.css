@@ -51,51 +51,53 @@
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
 /* Stylying the elements of the country details page*/
 /* General Layout */
 .country-details-container {
     /* margin: 20px auto; */
+    justify-content: center;
+    position: relative; /* I am not sure if it is helping or not */
     margin-top: 50px;
     padding: 30px;
     /* max-width: 1900px;  */
-    width: 80%;
-    height: 80%;
+    width: 100%;
+    height: 100%;
     /* min-height: 800px; */
     background-color: #ffffff;
     /* border-radius: 10px; */
-    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  */
 }
 
 
-/* Section Titles */
+/* Country details page Titles */
 .country-details-title {
-    font-size: 28px;
+    font-size: 40px;
     color: #333;
     font-weight: bold;
-    margin-bottom: 20px;
-    text-align: center; /* Center align the title */
+    margin-bottom: 100px;
+    margin-top: 0px;
+    text-align: center; 
+}
+
+/* Agreement details page Title*/
+.agreement-details-title{
+  font-size: 40px;
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 100px;
+  margin-top: 20px;
+  text-align: center; 
 }
 
 
-.country-details-list {
+/* .country-details-list {
     margin-top: 140px;
     width: 300px; 
     height: 60px; 
     padding: 8px 12px; 
     font-size: 20px; 
     font-family: "JetBrains Mono", monospace; 
-    color: #030101; 
+    color: #030101;  */
     /* background-color: rgb(255, 255, 255);  */
     /* border: 2px solid rgb(255, 255, 255);  */
     /* border-radius: 5px; 
@@ -103,7 +105,7 @@
     /* appearance: none; 
     cursor: pointer;
     transition: all 0.3s ease; Smooth transitions */
-}
+/* } */
 
 
 /* Map page button*/
@@ -163,29 +165,42 @@
   box-sizing: border-box;
   color: #fff;
   cursor: pointer;
-  display: inline-flex;
+  display: flex; /*inline-flex;*/
   font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
   font-size: 16px;
   font-weight: 600;
   justify-content: center;
-  line-height: 1.25;
+  line-height: 1.2;
   margin: 0;
-  min-height: 3rem;
-  padding: calc(.875rem - 1px) calc(1.5rem - 1px);
-  position: relative;
+  /* min-height: 3rem; */
+  padding: 10px; /* calc(.875rem - 1px) calc(1.5rem - 1px);*/
+  /* position: relative; */
   text-decoration: none;
   transition: all 250ms;
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
   vertical-align: baseline;
-  width: auto;
+  /* width: auto; */
+  width: 300px;
+  height: 150px;
+  overflow-y: auto; /* Enables vertical scrolling if content overflows */
+  white-space: normal; /* Allows text to wrap */
 }
 
 .agreement_btn:hover,
 .agreement_btn:focus {
   background-color: #fb8332;
   box-shadow: #ffffff1a 0 4px 12px;
+}
+
+/* Container to align agreement buttons */
+.agreement-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 50px;
+  padding: 20px;
 }
 
 /* .agreement_btn:hover {
@@ -201,65 +216,3 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* Agreement buttons*/
-/* .agreement_btn {
-  align-items: center;
-  background-color: #FFFFFF;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: .25rem;
-  box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
-  box-sizing: border-box;
-  color: rgba(0, 0, 0, 0.85);
-  cursor: pointer;
-  display: inline-flex;
-  font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  justify-content: center;
-  line-height: 1.25;
-  margin: 0;
-  min-height: 3rem;
-  padding: calc(.875rem - 1px) calc(1.5rem - 1px);
-  position: relative;
-  text-decoration: none;
-  transition: all 250ms;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  vertical-align: baseline;
-  width: auto;
-}
-
-.agreement_btn:hover,
-.agreement_btn:focus {
-  border-color: rgba(0, 0, 0, 0.15);
-  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
-  color: rgba(0, 0, 0, 0.65);
-}
-
-.agreement_btn:hover {
-  transform: translateY(-1px);
-}
-
-.agreement_btn :active {
-  background-color: #F0F0F1;
-  border-color: rgba(0, 0, 0, 0.15);
-  box-shadow: rgba(0, 0, 0, 0.06) 0 2px 4px;
-  color: rgba(0, 0, 0, 0.65);
-  transform: translateY(0);
-}
- */
