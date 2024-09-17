@@ -3,6 +3,14 @@
     background-color: pink
   } */
 
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* height: 100vh;  */
+    margin: 0;
+  }
+
   .leaflet-container {
     position: relative;
     background-color: rgb(255, 255, 255) !important;
@@ -56,7 +64,7 @@
 .country-details-container {
     /* margin: 20px auto; */
     justify-content: center;
-    position: relative; /* I am not sure if it is helping or not */
+    display: center; /* I am not sure if it is helping or not */
     margin-top: 50px;
     padding: 30px;
     /* max-width: 1900px;  */

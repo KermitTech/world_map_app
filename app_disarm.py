@@ -13,6 +13,7 @@ from legend import create_legend
 from map import create_map
 from country_details_ui import country_details
 from agreement_details_ui import agreement_details
+from agreement_dataFrame import agreement_table
 
 #########################################
 ########### Excel DATA ##################
@@ -107,6 +108,8 @@ for d in data_json["features"]:
             mapping[d["Name"]] = 0
 
 
+########################################
+##### Server function 
 
 def server(input, output, session):
 
@@ -152,14 +155,25 @@ def server(input, output, session):
     ### Agreement details ui
 
     @output
+    # @render.data_frame
     @render.ui
     def agreement_details_ui():
+        df = new_df_disarm
         if page.get() == "agreement_details":
             agreement = selected_agreement.get()
-            return agreement_details(agreement)
+            return agreement_details(agreement, df)
 
+    #########################################
+    ### Agreement table
 
-
+    @output
+    @render.data_frame
+    def table():
+        agreement = selected_agreement.get()
+        df = new_df_disarm
+        country = selected_country.get()
+        return agreement_table(agreement, df, country)
+    
     ##########################################
     ### Country details ui
 
