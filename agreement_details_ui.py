@@ -3,11 +3,18 @@ from shiny import ui
 
 
 
-def agreement_details(agreement):
+
+def agreement_details(agreement, df):
+
+    #df = new_df_disarm
+    pa_3rd = df[df['pa_name'] == agreement]['pa_3rd'].iloc[0]
+    # table = agreement_table(agreement, df)
 
     ui_details = ui.div(ui.page_fluid(
         ui.input_action_button("show_country_details_page", "Agreement page", class_= 'country-details-btn'),
-        ui.h2(f"agreement details page for {agreement}", class_="agreement-details-title")),
-    class_="country-details-container")
+        ui.h2(f'Details for the agreement "{agreement}"', class_="agreement-details-title"),
+        ui.p(f"{pa_3rd }"),
+        ui.output_data_frame("table")
+        ), class_="country-details-container")
 
     return ui_details 
