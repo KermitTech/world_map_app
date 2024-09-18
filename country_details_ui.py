@@ -6,7 +6,7 @@ converter = coco.CountryConverter()
  
 
 
-def country_details(country, df):
+def country_details(country, df, pa_count):
     # df = new_df_disarm
 
     pa_df = df[df['ISO3']==country][['pa_name', 'year']]
@@ -17,7 +17,13 @@ def country_details(country, df):
     short_country_name = converter.convert(names=country, src="ISO3", to="name_short")
     
     ui_details = ui.div(ui.page_fluid(
-        ui.input_action_button("show_map_page", "Map Page", class_= 'country-details-btn'),
+        ui.div(
+            ui.input_action_button("show_map_page", "Map Page", class_= 'country-details-btn'),
+            ui.div(ui.div(ui.p(f"{pa_count}"), class_= "stat-number"),
+                   ui.div(ui.p("Number of"), class_= "stat-label1"),
+                   ui.div(ui.p("Agreements"), class_= "stat-label2")
+                   , class_="top-right-stats ")
+            , class_="header-container"),
         ui.h2(f"{short_country_name}", class_="country-details-title"), 
         ui.div(
             # *[ui.div(ui.input_action_button(f"{d}", pa_name.iloc[d], class_="agreement_btn")) for d in range(len(pa_name))],

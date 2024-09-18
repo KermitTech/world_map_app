@@ -24,6 +24,7 @@
     justify-content: flex-end; */
     margin-top: 50px;  
     text-align: left; 
+    font-size: 28px;
     padding-right: 50px; 
 }
 
@@ -40,7 +41,7 @@
 
 
 /* styling the legend */
-.legend {
+.legend-container {
     position: relative;
     bottom: 10px;
     left: 100px;
@@ -52,12 +53,34 @@
     /* overflow-wrap: break-word; */
 }
 
-.legend h4 {
+.legend-container h4 {
     margin: 0 0 10px 0;
     font-size: 20px;
     font-weight: bold;
 }
 
+.legend-color-block {
+  width: 20px;
+  height: 10px;
+  margin-right: 5px;
+  border: 1px solid black;
+}
+
+.legend-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.legend-text {
+  font-size: 16px;
+}
 
 /* Stylying the elements of the country details page*/
 /* General Layout */
@@ -115,6 +138,46 @@
     transition: all 0.3s ease; Smooth transitions */
 /* } */
 
+
+/* Header for country details page. */
+/* In the header we have a button and the total number of agreements*/
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #ffffff; /* light background */
+}
+
+.top-right-stats {
+  text-align: right;
+  line-height: 0.8;
+  /* border: 0;
+  border-radius: 6px;
+  box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
+  box-sizing: border-box;
+  background-color:  #5468ff; */
+}
+
+.stat-number {
+  font-size: 30px;
+  font-weight: bold;
+  color: #000000;
+  text-align: center;
+}
+
+.stat-label1 {
+  font-size: 18px;
+  color: #000000;
+  text-align: center;
+}
+
+.stat-label2 {
+  font-size: 24px;
+  color: #666;
+  font-weight: bold;
+  text-align: center;
+}
 
 /* Map page button*/
 .country-details-btn {

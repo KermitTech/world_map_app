@@ -107,6 +107,7 @@ for d in data_json["features"]:
     if d["Name"] not in mapping:
             mapping[d["Name"]] = 0
 
+# print(mapping)  # it has iso3 country names and total number of agreements for each country
 
 ########################################
 ##### Server function 
@@ -183,7 +184,8 @@ def server(input, output, session):
         if page.get() == "country_details":
             country = selected_country.get()
             df = new_df_disarm
-            return country_details(country, df)
+            pa_count = mapping[country]
+            return country_details(country, df, pa_count)
 
        
     ##########################################
