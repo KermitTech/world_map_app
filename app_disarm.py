@@ -2,102 +2,31 @@ from ipyleaflet import Choropleth, Map, LegendControl, GeoJSON, GeoData, Popup, 
 from shapely.geometry import Point, Polygon
 from shiny import App, ui, render, reactive
 from shinywidgets import output_widget, render_widget, render_plotly 
-import geopandas as gpd
+
 from branca.colormap import linear
-import json
-import plotly.express as px
-import pandas as pd
+
+
 from htmltools import head_content
-import country_converter as coco
+
 from legend import create_legend
 from map import create_map
 from country_details_ui import country_details
 from agreement_details_ui import agreement_details
 from agreement_dataFrame import agreement_table
-
-#########################################
-########### Excel DATA ##################
-
-df_disarm = pd.read_excel("data/disarm_2022-03-11.xlsx")
-# print(df_disarm.head())
-
-## Using the first row values of df dataframe as the column names of the new_df.
-headers = df_disarm.iloc[0]
-new_df_disarm  = pd.DataFrame(df_disarm.values[1:], columns=headers)
-new_df_disarm = new_df_disarm.dropna(subset=['ID'])
-# print(new_df_disarm)
-# print(new_df_disarm.columns)
-# print(new_df_disarm[new_df_disarm['gwno'] =='700'])
-
-##### duplicate the columns with gwno of the type ... , ....
-new_df_disarm['gwno'] = new_df_disarm['gwno'].str.split(', ')
-# print(new_df_disarm[new_df_disarm['ID'] == 141])
-
-new_df_disarm = new_df_disarm.explode('gwno').reset_index(drop=True)
-# print(new_df_disarm[new_df_disarm['ID'] == 141])
-
-new_df_disarm['ID'] = new_df_disarm.groupby('ID').cumcount() + 1 + (new_df_disarm['ID'] * 10)
-# print(new_df_disarm[new_df_disarm['ID'] == 1412])
-
-####### adding ISO3 and short country name columns ######### 
-converter = coco.CountryConverter()
-
-gwcodes = new_df_disarm['gwno']
-# # print(gwcodes)
-
-ISO3column = converter.convert(names=gwcodes, src="GWcode", to="ISO3")
-shortCountryName = converter.convert(names=gwcodes, src="GWcode", to="name_short")
-# #  print(ISO3column)
-idx = 5 
-
-new_df_disarm.insert(loc=idx, column='ISO3', value = ISO3column)
-new_df_disarm.insert(loc=idx+1, column='country_name', value = shortCountryName)
-# print(new_df_disarm['country_name'])
+from data.data_cleaning import new_df_disarm 
+from data.http_to_hhtps import replace_http
+from data.mapping import mapping
+from data.polygon_data import data_json
 
 
-########## Some aggregations on the data
-### number of peace agreements per country
-
-no_distinct_gwno = new_df_disarm['gwno'].nunique()
-# print(no_distinct_gwno)
-
-counts_pa_perCountry = new_df_disarm.groupby('gwno')['pa_name'].count()
-
-### converting counts_pa_perCountry (it is a series) into a dataframe
-counts_pa_perCountry_df = counts_pa_perCountry.reset_index()
-
-### change the pa_column name
-counts_pa_perCountry_df = counts_pa_perCountry_df.rename(columns={"pa_name":"pa_counts"}) 
-
-#### convert the gwno code to iso3 and short country name
-iso3 = converter.convert(names=counts_pa_perCountry_df['gwno'], src="GWcode", to="ISO3")
-short_country_name = converter.convert(names=counts_pa_perCountry_df['gwno'], src="GWcode", to="name_short")
-
-#### insert the new columns into the dataframe counts_pa_perCountry_df
-counts_pa_perCountry_df.insert(loc=1, column='ISO3', value = iso3)
-counts_pa_perCountry_df.insert(loc=2, column='country_name', value = short_country_name)
-
-#### removed south Yemen
-counts_pa_perCountry_df = counts_pa_perCountry_df.drop(counts_pa_perCountry_df[counts_pa_perCountry_df['gwno'] == '678'].index)
-# print(counts_pa_perCountry_df)
-
-mapping  = dict(zip(counts_pa_perCountry_df['ISO3'].str.strip(), counts_pa_perCountry_df['pa_counts']))
-# print(mapping)
 
 
-#########################################
-############ Polygon DATA ###############
-geOdf = gpd.read_file('data/world-administrative-boundaries.kml')
-# print(geOdf.head())
 
-geo_json_data = geOdf.to_json()
-data_json=json.loads(geo_json_data) ## this is converting a json string into a dictionary
 
-#### We need to make a new column named "Name" to use as key_on
-for d in data_json["features"]:
-    d["Name"] = d["properties"]["Name"]
 
-# print(data_json)
+
+
+
 
 ##########################################
 ### Making sure that the iso3 values in the geo data is the same as the iso3 in 
@@ -108,6 +37,9 @@ for d in data_json["features"]:
             mapping[d["Name"]] = 0
 
 # print(mapping)  # it has iso3 country names and total number of agreements for each country
+
+
+
 
 ########################################
 ##### Server function 
@@ -150,6 +82,20 @@ def server(input, output, session):
     def show_country_details_from_agreement_page():
         page.set("country_details")
 
+    
+    # Go to page to download the entire text for the peace agreement
+    @reactive.Effect
+    @reactive.event(input.Download_entire_agreement)
+    async def test_message():
+        # print("Download button clicked!")
+        agreement = selected_agreement.get()
+        country = selected_country.get()
+        # print(agreement)
+        download = new_df_disarm[(new_df_disarm['ISO3']==country) & (new_df_disarm['pa_name']==agreement)]['linktofulltextagreement']
+        download = download.apply(replace_http)
+        # print(download)
+        download_link = download.iloc[0]
+        await session.send_custom_message('test_message', f"{download_link}")
 
 
     ##########################################
@@ -217,6 +163,7 @@ def server(input, output, session):
 
 app_ui = ui.page_fluid(
     ui.head_content(ui.include_css("styles.css")), 
+    ui.head_content(ui.include_js("www/download_page.js")),
     ui.div(
         ui.navset_pill(  
             ui.nav_panel("Data", 
@@ -224,7 +171,6 @@ app_ui = ui.page_fluid(
                 ui.output_ui("country_details_ui"), 
                 ui.output_ui("agreement_details_ui")    
             ),          
-                ui.nav_panel("Download"),
                 ui.nav_panel("About",
                             ui.h2("About This Application"),
                             ui.p("This application is designed to..."),
