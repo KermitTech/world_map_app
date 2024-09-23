@@ -1,5 +1,7 @@
 import country_converter as coco
 from data.data_cleaning import new_df_disarm 
+from data.polygon_data import data_json
+
 
 ########## Some aggregations on the data
 ### number of peace agreements per country
@@ -32,3 +34,15 @@ counts_pa_perCountry_df = counts_pa_perCountry_df.drop(counts_pa_perCountry_df[c
 
 mapping  = dict(zip(counts_pa_perCountry_df['ISO3'].str.strip(), counts_pa_perCountry_df['pa_counts']))
 # print(mapping)
+
+
+
+##########################################
+### Making sure that the iso3 values in the geo data is the same as the iso3 in 
+### the Excel file
+
+for d in data_json["features"]:
+    if d["Name"] not in mapping:
+            mapping[d["Name"]] = 0
+
+# print(mapping)  # it has iso3 country names and total number of agreements for each country
