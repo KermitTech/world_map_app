@@ -2,5 +2,6 @@ world_happiness_2019.csv
 custom_geo.json
 .venv
 test
-data
 app.py
+data2
+pic
