@@ -113,7 +113,8 @@ def server(input, output, session):
     def map():
         polygon_data = data_json
         mapping_data = mapping
-        return create_map(selected_country, polygon_data, mapping_data)
+        map = create_map(selected_country, polygon_data, mapping_data)
+        return map
         # return create_map()
 
     ##########################################
@@ -124,7 +125,6 @@ def server(input, output, session):
     def map_ui():
         if page.get() == "map":
             return ui.page_fluid(
-                ui.div(output_widget("map"), 
-                ui.div(ui.HTML(create_legend(mapping)), class_="legend"),
-                class_="leaflet-container"), 
+                output_widget("map"), 
+                ui.div(ui.HTML(create_legend(mapping)), class_="legend"), 
             )

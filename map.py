@@ -1,4 +1,4 @@
-from ipyleaflet import Choropleth, Map
+from ipyleaflet import Choropleth, Map #, FullScreenControl
 from shapely.geometry import Point, Polygon
 from branca.colormap import linear
 
@@ -8,8 +8,16 @@ from branca.colormap import linear
 
 def create_map(selected_country, polygon_data, mapping_data):
 
-    m = Map(zoom=2)
-    m.layout.height="600px"
+    m = Map(center=(51.505, -0.09), zoom=2)
+    m.layout.height="70vh"
+    m.layout.width="100%"
+    #m.layout.height="700px"
+
+    # m.layout.min_height="700px"
+    #m.fit_bounds([[-90, -180], [90, 180]])
+
+    #control = FullScreenControl()
+    #m.add_control(control)
 
     m.layers = ()
 
@@ -17,7 +25,7 @@ def create_map(selected_country, polygon_data, mapping_data):
         geo_data= polygon_data, # data_json,
         choro_data=mapping_data,  
         colormap=linear.Paired_03,   ## Blues_03, Paired_03, PRGn_03
-        style={'fillOpacity': 1.0, "color":"black"},
+        # style={'fillOpacity': 1.0, "color":"black"},
         key_on="Name", 
         hover_style={'fillColor': 'red' , 'fillOpacity': 0.2}
         ) 
@@ -68,7 +76,7 @@ def create_map(selected_country, polygon_data, mapping_data):
     m.on_interaction(handle_click)   
 
 
-    layer.on_click(handle_click)
+    # layer.on_click(handle_click)
 
 
     return m
