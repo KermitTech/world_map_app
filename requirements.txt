@@ -1,10 +1,10 @@
+shiny
+country_converter
 ipyleaflet
 shapely
-shiny
+branca
+numpy
 shinywidgets
-pandas
-plotly
-geopandas
-htmltools
-country_converter
-openpyxl
+ipywidgets
+
+

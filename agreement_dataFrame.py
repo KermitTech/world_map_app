@@ -1,5 +1,3 @@
-import pandas as pd
-from shiny import render, ui
 
 
 def agreement_table(agreement, df, country):
