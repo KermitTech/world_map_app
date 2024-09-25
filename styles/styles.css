@@ -40,6 +40,7 @@
     text-align: left; 
     font-size: 24px;
     padding-right: 50px; 
+    
 }
 
 /* Adjust the styling of individual tab buttons, if needed */
@@ -51,6 +52,9 @@
 .custom-nav-tabs .nav-link.active {
     font-weight: bold;
     color: rgb(255, 255, 255);
+    background-color: #3c4fe0;
+    border-color: #3c4fe0;
+    border-radius: 20px;
 }
 
 
@@ -151,6 +155,7 @@
   width: 160px;
   height: 60px;
   background-color: #3c4fe0; /* Black background */
+  border-color: #3c4fe0;
   /* background-image: none; */
   /* background-image: -webkit-linear-gradient(bottom, rgba(0,0,0,.075), rgba(255,255,255,.045));
   background-image: linear-gradient(to top, rgba(255,255,255,.045), rgba(255,255,255,.045)); */
@@ -168,6 +173,7 @@
 .Download_btn:hover {
   right: calc(50% - 200px);
   background-color: #1e90ff; 
+  border-color: #1e90ff;
   width: 270px;
 }
 
@@ -283,16 +289,16 @@
 .country-details-btn {
   align-items: center;
   appearance: none;
-  background-image: radial-gradient(100% 100% at 100% 0, #5adaff 0, #5468ff 100%);
+  background-image: radial-gradient(100% 100% at 100% 0, #5adaff 0, #3c4fe0 100%);
   border: 0;
-  border-radius: 6px;
+  border-radius: 20px;
   box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
   box-sizing: border-box;
   color: #fff;
   cursor: pointer;
   display: inline-flex;
-  font-family: "JetBrains Mono",monospace;
-  height: 48px;
+  /* font-family: "JetBrains Mono",monospace; */
+  height: 60px;
   justify-content: center;
   line-height: 1;
   list-style: none;

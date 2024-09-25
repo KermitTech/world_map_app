@@ -16,7 +16,7 @@ def agreement_details(agreement, df):
             ui.div(ui.input_action_button("Download_entire_agreement", "", class_= "Download_btn"))
         , class_="header-container"),
         ui.h2(f'Details for the agreement "{agreement}"', class_="agreement-details-title"),
-        ui.p(f"{pa_3rd }"),
+        # ui.p(f"{pa_3rd }"),
         ui.output_data_frame("table")
         # ui.output_ui("table")
         ), class_="country-details-container")
