@@ -8,4 +8,5 @@ def agreement_table(agreement, df, country):
     # print(df_new)
     df_new = df_new.rename(columns={'pa_date': 'Date', 'conflict_name': 'Conflict Name', 'pa_comment':'Comment'})
 
+
     return df_new
