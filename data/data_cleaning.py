@@ -1,11 +1,14 @@
 import pandas as pd
 import country_converter as coco
+from pathlib import Path
 
 
 #########################################
 ########### Excel DATA ##################
 
-df_disarm = pd.read_excel("data/disarm_2022-03-11.xlsx")
+data_path = Path(__file__).parent / "disarm_2022-03-11.xlsx"
+
+df_disarm = pd.read_excel(data_path)
 # print(df_disarm.head())
 
 ## Using the first row values of df dataframe as the column names of the new_df.
