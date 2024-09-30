@@ -1,10 +1,17 @@
 shiny
-country_converter
+shinywidgets
 ipyleaflet
 shapely
 branca
 numpy
-shinywidgets
+pandas
+geopandas
 ipywidgets
+# json
+# re
+# pathlib
+country_converter
+openpyxl
+# Fiona
 
 
