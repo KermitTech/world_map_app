@@ -16,7 +16,7 @@ def agreement_details(agreement, df):
         , class_="header-container"),
         ui.h2(f'Details for the agreement "{agreement}"', class_="agreement-details-title"),
         # ui.p(f"{pa_3rd }"),
-        ui.output_data_frame("table")
+        ui.div(ui.output_data_frame("table"), class_="table")
         # ui.output_ui("table")
         ), class_="country-details-container")
 
