@@ -9,7 +9,7 @@ from data.http_to_hhtps import replace_http
 from data.mapping import mapping
 from data.polygon_data import data_json
 from shinywidgets import output_widget, render_widget 
-
+#import map
 
 
 ########################################
@@ -20,6 +20,7 @@ def server(input, output, session):
     page = reactive.Value("map")
     selected_country = reactive.Value(None)
     selected_agreement = reactive.Value(None)
+    # selected_tab = input.tab_selected()
 
     # Switch to map page
     @reactive.Effect
@@ -68,6 +69,19 @@ def server(input, output, session):
         download_link = download.iloc[0]
         await session.send_custom_message('test_message', f"{download_link}")
 
+    
+    # # Going back to map page when clicking on Data tab
+    # @reactive.Effect
+    # @reactive.event(input.tab)  
+    # def handle_tab_change():
+    #     if input.tab() == "Data": 
+    #         print("Data tab selected, displaying map.")
+    #         session.send_input_message("map_ui", "")
+    #         # ui.update_ui("map_ui")
+
+
+
+
 
     ##########################################
     ### Agreement details ui
@@ -113,7 +127,7 @@ def server(input, output, session):
     def map():
         polygon_data = data_json
         mapping_data = mapping
-        map = create_map(selected_country, polygon_data, mapping_data)
+        map = create_map(selected_country, polygon_data, mapping_data, country_text)
         return map
         # return create_map()
 
@@ -127,4 +141,19 @@ def server(input, output, session):
             return ui.page_fluid(
                 output_widget("map"), 
                 ui.div(ui.HTML(create_legend(mapping)), class_="legend"), 
+                ui.div(
+                    ui.output_text("country_tooltip"),
+                    class_="custom-tooltip") 
             )
+        
+    #### Tooltips ####
+    # country_text = reactive.Value("Hover over a country")
+    country_text = reactive.Value("")
+
+    @output
+    @render.text
+    def country_tooltip():
+        return country_text.get()
+
+
+    
