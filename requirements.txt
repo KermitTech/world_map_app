@@ -13,5 +13,6 @@ ipywidgets
 country_converter
 openpyxl
 # Fiona
+jupyter-leaflet
 
 
