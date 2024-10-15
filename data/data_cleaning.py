@@ -17,7 +17,11 @@ new_df_disarm  = pd.DataFrame(df_disarm.values[1:], columns=headers)
 new_df_disarm = new_df_disarm.dropna(subset=['ID'])
 # print(new_df_disarm)
 # print(new_df_disarm.columns)
-# print(new_df_disarm[new_df_disarm['gwno'] =='700'])
+# print(new_df_disarm[new_df_disarm['gwno'] =='678'])
+new_df_disarm.loc[new_df_disarm['gwno'] =='678', 'gwno'] = '680'
+new_df_disarm.loc[new_df_disarm['gwno'] =='678, 680', 'gwno'] = '680'
+
+# print(new_df_disarm[new_df_disarm['gwno'] =='678, 680'])
 
 ##### duplicate the columns with gwno of the type ... , ....
 new_df_disarm['gwno'] = new_df_disarm['gwno'].str.split(', ')
