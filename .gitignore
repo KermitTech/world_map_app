@@ -1,7 +1,8 @@
 world_happiness_2019.csv
 custom_geo.json
 .venv
-test
+test.py
 data2
 pic
-# docs/
+docs/
+
